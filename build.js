@@ -66,24 +66,41 @@ async function generateHTML(sourceHTML, route) {
 }
 
 async function copyAssets() {
-  try {
-    // Create necessary directories
-    await fs.mkdir('docs/content', { recursive: true });
-    await fs.mkdir('docs/assets', { recursive: true });
-
-    // Copy content directory
-    await fs.cp('site/content', 'docs/content', { recursive: true });
-    
-    // Copy assets if they exist
-    if (await fs.access('site/assets').catch(() => false)) {
-      await fs.cp('site/assets', 'docs/assets', { recursive: true });
+    try {
+      // Create necessary directories
+      await fs.mkdir('docs/content', { recursive: true });
+      await fs.mkdir('docs/assets/images', { recursive: true });
+  
+      console.log('📂 Copying content and assets...');
+  
+      // Copy content directory
+      console.log('📚 Copying content...');
+      await fs.cp('site/content', 'docs/content', { recursive: true });
+      
+      // Copy images specifically
+      console.log('🖼️ Copying images...');
+      const imagesPath = 'site/assets/images';
+      if (await fs.access(imagesPath).then(() => true).catch(() => false)) {
+        await fs.cp(imagesPath, 'docs/assets/images', { recursive: true });
+        console.log('✅ Images copied successfully');
+      } else {
+        console.warn('⚠️ No images directory found at:', imagesPath);
+      }
+  
+      // Verify image exists
+      const bookImagePath = 'docs/assets/images/book.jpg';
+      if (await fs.access(bookImagePath).then(() => true).catch(() => false)) {
+        console.log('✅ Book image verified at:', bookImagePath);
+      } else {
+        console.error('❌ Book image not found at:', bookImagePath);
+      }
+  
+      console.log('📦 All assets copied successfully');
+    } catch (error) {
+      console.error('❌ Error copying assets:', error);
+      console.error('Error details:', error.message);
+      throw error;
     }
-
-    console.log('Assets copied successfully');
-  } catch (error) {
-    console.error('Error copying assets:', error);
-    throw error;
   }
-}
 
 build();
