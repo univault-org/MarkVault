@@ -899,6 +899,7 @@
         const { posts, isLoading } = React.useContext(GlobalContext);
         const [postData, setPostData] = React.useState([]);
         const [error, setError] = React.useState(null);
+
         React.useEffect(() => {
           if (!isLoading) {
             Promise.all(
@@ -908,20 +909,29 @@
                     "posts",
                     file
                   );
+
+                  // Fix image paths by removing leading slash
+                  const defaultImage =
+                    `${window.BASE_URL}/assets/images/book.jpg`.replace(
+                      /\/\/+/g,
+                      "/"
+                    );
+                  const customImage = metadata.image
+                    ? `${window.BASE_URL}/${metadata.image}`.replace(
+                        /\/\/+/g,
+                        "/"
+                      )
+                    : null;
+
                   return {
                     slug: file.replace(".md", ""),
                     title: metadata.title || file.replace(".md", ""),
                     date: metadata.date || "Unknown date",
                     excerpt: metadata.excerpt || "",
-                    // Update image path with BASE_URL
-                    image:
-                      index === 0
-                        ? `${window.BASE_URL}/assets/images/book.jpg`
-                        : metadata.image
-                        ? `${window.BASE_URL}/${metadata.image}`
-                        : null,
+                    image: index === 0 ? defaultImage : customImage,
                   };
                 } catch (err) {
+                  console.error("Error loading post:", err);
                   setError("Failed to load posts");
                   return null;
                 }
@@ -1048,10 +1058,15 @@
         React.useEffect(() => {
           fetchMarkdown("posts", `${slug}.md`)
             .then(({ content, metadata }) => {
-              // Update image path with BASE_URL
-              const imagePath = metadata.image
-                ? `${window.BASE_URL}/${metadata.image}`
-                : `${window.BASE_URL}/assets/images/book.jpg`;
+              // Clean up image paths to avoid double slashes
+              const defaultImage =
+                `${window.BASE_URL}/assets/images/book.jpg`.replace(
+                  /\/\/+/g,
+                  "/"
+                );
+              const customImage = metadata.image
+                ? `${window.BASE_URL}/${metadata.image}`.replace(/\/\/+/g, "/")
+                : defaultImage;
 
               setPost({
                 content,
@@ -1060,11 +1075,19 @@
                 author: metadata.author || "Anonymous",
                 readingTime: calculateReadingTime(content),
                 excerpt: metadata.excerpt,
-                image: imagePath, // Use the updated path
+                image: customImage,
               });
               setIsLoading(false);
+
+              // Debug info
+              console.group("🖼️ Post Image Path");
+              console.log("BASE_URL:", window.BASE_URL);
+              console.log("Custom image:", metadata.image);
+              console.log("Final path:", customImage);
+              console.groupEnd();
             })
             .catch((err) => {
+              console.error("Error loading post:", err);
               setError("Failed to load post");
               setIsLoading(false);
             });
