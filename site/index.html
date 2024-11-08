@@ -5,10 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>MarkVault Starter</title>
 
-    <script>
-      window.BASE_URL =
-        window.location.hostname === "localhost" ? "" : "/MarkVault";
-    </script>
+      <script>
+        window.BASE_URL = window.location.hostname === "localhost" 
+          ? "" 
+          : "/MarkVault";
+      </script>
     <!-- React and ReactDOM -->
     <script
       crossorigin
@@ -37,15 +38,6 @@
       import remarkGfm from "https://esm.sh/remark-gfm@4.0.0";
 
       // Make them available globally
-      window.ReactMarkdown = ReactMarkdown;
-      window.remarkGfm = remarkGfm;
-    </script>
-
-    <!-- Add this script to make ReactMarkdown globally available -->
-    <script type="module">
-      import ReactMarkdown from "https://esm.sh/react-markdown@9.0.1";
-      import remarkGfm from "https://esm.sh/remark-gfm@4.0.0";
-
       window.ReactMarkdown = ReactMarkdown;
       window.remarkGfm = remarkGfm;
     </script>
@@ -128,25 +120,26 @@
       }
     </script>
 
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // For local development
+    window.BASE_URL = window.location.hostname === "localhost" 
+      ? "" 
+      : "/MarkVault";
+
+    console.log("BASE_URL Configuration:");
+    console.log("- Hostname:", window.location.hostname);
+    console.log("- BASE_URL:", window.BASE_URL);
+    console.log("- Full URL:", window.location.href);
+  });
+</script>
+  
     <script>
-      document.addEventListener("DOMContentLoaded", function () {
-        // For local development
-        window.BASE_URL =
-          window.location.hostname === "localhost" ? "" : "/MarkVault";
-
-        console.log("BASE_URL Configuration:");
-        console.log("- Hostname:", window.location.hostname);
-        console.log("- BASE_URL:", window.BASE_URL);
-        console.log("- Full URL:", window.location.href);
-      });
+      window.BASE_URL = '/MarkVault';
+      window.initialRoute = '/';
     </script>
-
-    <script>
-      window.BASE_URL = "/MarkVault";
-      window.initialRoute = "/";
-    </script>
-  </head>
-
+    </head>
+    
   <body>
     <div id="root"></div>
     <script type="text/babel">
@@ -165,40 +158,35 @@
        */
       async function fetchMarkdown(type, fileName) {
         try {
-          const cleanFileName = fileName.replace(/^\/+|\/+$/g, "");
-          const base = window.BASE_URL || "";
-
-          // Update the fetch path to include BASE_URL
-          const response = await fetch(
-            `${base}/content/${type}/${cleanFileName}`
-          );
-
-          console.group("📚 Fetching Markdown");
-          console.log("Type:", type);
-          console.log("File:", cleanFileName);
-          console.log("URL:", `${base}/content/${type}/${cleanFileName}`);
-          console.groupEnd();
+          const cleanFileName = fileName.replace(/^\/+/, "");
+          const response = await fetch(`./content/${type}/${cleanFileName}`);
 
           if (!response.ok) {
-            throw new Error(`Failed to fetch ${fileName}: ${response.status}`);
+            console.error(`HTTP error! status: ${response.status}`);
+            throw new Error(`Failed to fetch ${fileName} (${response.status})`);
           }
 
           const text = await response.text();
-          const parts = text.split("---\n");
+          console.log("Fetched content:", text.substring(0, 100)); // Debug log
 
+          // Parse frontmatter and content
+          const parts = text.split("---\n");
           if (parts.length < 3) {
             return {
+              content: text, // Raw markdown text instead of marked.parse
               metadata: {},
-              content: text,
             };
           }
 
+          const [, frontmatter, ...contentParts] = parts;
+          const metadata = parseFrontmatter(frontmatter);
+
           return {
-            metadata: yaml.load(parts[1]) || {},
-            content: parts.slice(2).join("---\n"),
+            content: contentParts.join("---\n"), // Raw markdown text
+            metadata,
           };
         } catch (error) {
-          console.error("Error fetching markdown:", error);
+          console.error(`Error fetching markdown:`, error);
           throw error;
         }
       }
@@ -256,18 +244,18 @@
         try {
           // For development, return hardcoded list
           console.log("Fetching content list for:", type); // Debug log
-          const base = window.BASE_URL || "";
-          const response = await fetch(`${base}/content/${type}`);
+          return type === "posts" ? ["WHY.md"] : [];
 
-          console.log(`Fetching content list for: ${type}`);
-          console.log("URL:", `${base}/content/${type}`);
-
+          // The following code will be used when we have proper server setup
+          /*
+          const response = await fetch(`./content/${type}/`);
           if (!response.ok) {
-            throw new Error(`Failed to fetch content list: ${response.status}`);
+            throw new Error(`HTTP error! status: ${response.status}`);
           }
-
-          const data = await response.json();
-          return data.files || [];
+          const text = await response.text();
+          const files = text.match(/href="([^"]+\.md)"/g) || [];
+          return files.map(file => file.replace('href="', '').replace('"', ''));
+          */
         } catch (error) {
           console.error(`Error fetching ${type} list:`, error);
           // For development, return hardcoded list even if fetch fails
@@ -329,17 +317,13 @@
        * @returns {string} Current route path
        */
       function useRouter() {
-        const [path, setPath] = React.useState(window.location.pathname);
+        const [path, setPath] = React.useState(window.location.hash || "#/");
 
         React.useEffect(() => {
-          const handleRoute = () => {
-            setPath(window.location.pathname.replace(window.BASE_URL, ""));
-          };
-
-          window.addEventListener("popstate", handleRoute);
-          handleRoute();
-
-          return () => window.removeEventListener("popstate", handleRoute);
+          const handleHashChange = () => setPath(window.location.hash || "#/");
+          window.addEventListener("hashchange", handleHashChange);
+          return () =>
+            window.removeEventListener("hashchange", handleHashChange);
         }, []);
 
         return path;
@@ -429,21 +413,17 @@
 
       function Navigation() {
         const path = useRouter();
-        const base = window.BASE_URL || "";
 
         return (
           <nav className="flex items-center justify-between w-full">
-            <a
-              href={`${base}/`}
-              className="hover:opacity-80 transition-opacity"
-            >
+            <a href="#/" className="hover:opacity-80 transition-opacity">
               <Logo />
             </a>
             <div className="space-x-4">
               <a
-                href={`${base}/`}
+                href="#/"
                 className={`${
-                  path === "/" || path === ""
+                  path === "#/"
                     ? "text-primary-600 dark:text-primary-400"
                     : "text-neutral-600 dark:text-neutral-400 hover:text-primary-600 dark:hover:text-primary-400"
                 }`}
@@ -451,9 +431,9 @@
                 Home
               </a>
               <a
-                href={`${base}/about`}
+                href="#/about"
                 className={`${
-                  path === "/about"
+                  path === "#/about"
                     ? "text-primary-600 dark:text-primary-400"
                     : "text-neutral-600 dark:text-neutral-400 hover:text-primary-600 dark:hover:text-primary-400"
                 }`}
@@ -461,9 +441,9 @@
                 About
               </a>
               <a
-                href={`${base}/posts`}
+                href="#/posts"
                 className={`${
-                  path === "/posts"
+                  path === "#/posts"
                     ? "text-primary-600 dark:text-primary-400"
                     : "text-neutral-600 dark:text-neutral-400 hover:text-primary-600 dark:hover:text-primary-400"
                 }`}
@@ -553,7 +533,7 @@
             <div className="mb-4">
               <h3>
                 <a
-                  href={`/posts/${slug}`}
+                  href={`#/posts/${slug}`}
                   className="no-underline text-neutral-700 dark:text-neutral-200 hover:text-primary-600 dark:hover:text-primary-400"
                 >
                   {title}
@@ -570,7 +550,7 @@
           <article className="bg-white dark:bg-neutral-800 p-6 rounded-lg shadow-sm animate-fadeIn hover:shadow-md transition-shadow">
             <h2 className="text-2xl font-bold text-neutral-800 dark:text-neutral-100">
               <a
-                href={`/posts/${slug}`}
+                href={`#/posts/${slug}`}
                 className="hover:text-primary-600 dark:hover:text-primary-400"
               >
                 {title}
@@ -664,14 +644,14 @@
                     </p>
                     <div className="flex gap-4 justify-center pt-4">
                       <a
-                        href="/posts"
+                        href="#/posts"
                         className="inline-flex items-center px-6 py-3 rounded-lg bg-primary-500 hover:bg-primary-600 text-white font-medium transition-colors"
                       >
                         Explore Posts
                         <i className="bi bi-arrow-right ml-2"></i>
                       </a>
                       <a
-                        href="/about"
+                        href="#/about"
                         className="inline-flex items-center px-6 py-3 rounded-lg bg-neutral-100 hover:bg-neutral-200 dark:bg-neutral-700 dark:hover:bg-neutral-600 text-neutral-700 dark:text-neutral-100 font-medium transition-colors"
                       >
                         Learn More
@@ -909,7 +889,7 @@
                 Join us in building a more durable web.
               </p>
               <a
-                href="/posts"
+                href="#/posts"
                 className="inline-flex items-center px-6 py-3 rounded-lg bg-primary-500 hover:bg-primary-600 text-white font-medium transition-colors"
               >
                 Explore Posts
@@ -1002,7 +982,7 @@
                         </time>
                         <h2 className="text-2xl font-bold text-neutral-800 dark:text-neutral-100 mt-2 mb-4">
                           <a
-                            href={`/posts/${postData[0].slug}`}
+                            href={`#/posts/${postData[0].slug}`}
                             className="hover:text-primary-600 dark:hover:text-primary-400"
                           >
                             {postData[0].title}
@@ -1014,7 +994,7 @@
                           </p>
                         )}
                         <a
-                          href={`/posts/${postData[0].slug}`}
+                          href={`#/posts/${postData[0].slug}`}
                           className="inline-flex items-center text-primary-600 dark:text-primary-400 hover:underline"
                         >
                           Read More
@@ -1037,7 +1017,7 @@
                       </time>
                       <h2 className="text-xl font-bold text-neutral-800 dark:text-neutral-100 mt-2 mb-4">
                         <a
-                          href={`/posts/${post.slug}`}
+                          href={`#/posts/${post.slug}`}
                           className="hover:text-primary-600 dark:hover:text-primary-400"
                         >
                           {post.title}
@@ -1049,7 +1029,7 @@
                         </p>
                       )}
                       <a
-                        href={`/posts/${post.slug}`}
+                        href={`#/posts/${post.slug}`}
                         className="inline-flex items-center text-primary-600 dark:text-primary-400 hover:underline"
                       >
                         Read More
@@ -1275,7 +1255,7 @@
                 {/* Article Footer with enhanced navigation */}
                 <footer className="mt-12 mb-16 flex flex-col sm:flex-row justify-between items-center gap-4 text-neutral-500 dark:text-neutral-400">
                   <a
-                    href="/posts"
+                    href="#/posts"
                     className="inline-flex items-center px-4 py-2 rounded-lg bg-neutral-100 dark:bg-neutral-800 hover:bg-neutral-200 dark:hover:bg-neutral-700 transition-colors"
                   >
                     <i className="bi bi-arrow-left mr-2"></i>
@@ -1313,10 +1293,12 @@
         return (
           <GlobalProvider>
             <Layout>
-              {path === "/" && <Home />}
-              {path === "/about" && <About />}
-              {path === "/posts" && <PostList />}
-              {path.startsWith("/posts/") && <Post slug={path.split("/")[2]} />}
+              {path === "#/" && <Home />}
+              {path === "#/about" && <About />}
+              {path === "#/posts" && <PostList />}
+              {path.startsWith("#/posts/") && (
+                <Post slug={path.split("/")[2]} />
+              )}
             </Layout>
           </GlobalProvider>
         );
