@@ -5,11 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>MarkVault Starter</title>
 
-      <script>
-        window.BASE_URL = window.location.hostname === "localhost" 
-          ? "" 
-          : "/MarkVault";
-      </script>
+    <script>
+      window.BASE_URL =
+        window.location.hostname === "localhost" ? "" : "/MarkVault";
+    </script>
     <!-- React and ReactDOM -->
     <script
       crossorigin
@@ -129,26 +128,25 @@
       }
     </script>
 
-<script>
-  document.addEventListener('DOMContentLoaded', function() {
-    // For local development
-    window.BASE_URL = window.location.hostname === "localhost" 
-      ? "" 
-      : "/MarkVault";
-
-    console.log("BASE_URL Configuration:");
-    console.log("- Hostname:", window.location.hostname);
-    console.log("- BASE_URL:", window.BASE_URL);
-    console.log("- Full URL:", window.location.href);
-  });
-</script>
-  
     <script>
-      window.BASE_URL = '/MarkVault';
-      window.initialRoute = '/';
+      document.addEventListener("DOMContentLoaded", function () {
+        // For local development
+        window.BASE_URL =
+          window.location.hostname === "localhost" ? "" : "/MarkVault";
+
+        console.log("BASE_URL Configuration:");
+        console.log("- Hostname:", window.location.hostname);
+        console.log("- BASE_URL:", window.BASE_URL);
+        console.log("- Full URL:", window.location.href);
+      });
     </script>
-    </head>
-    
+
+    <script>
+      window.BASE_URL = "/MarkVault";
+      window.initialRoute = "/";
+    </script>
+  </head>
+
   <body>
     <div id="root"></div>
     <script type="text/babel">
@@ -326,13 +324,17 @@
        * @returns {string} Current route path
        */
       function useRouter() {
-        const [path, setPath] = React.useState(window.location.hash || "#/");
+        const [path, setPath] = React.useState(window.location.pathname);
 
         React.useEffect(() => {
-          const handleHashChange = () => setPath(window.location.hash || "#/");
-          window.addEventListener("hashchange", handleHashChange);
-          return () =>
-            window.removeEventListener("hashchange", handleHashChange);
+          const handleRoute = () => {
+            setPath(window.location.pathname.replace(window.BASE_URL, ""));
+          };
+
+          window.addEventListener("popstate", handleRoute);
+          handleRoute();
+
+          return () => window.removeEventListener("popstate", handleRoute);
         }, []);
 
         return path;
@@ -422,17 +424,21 @@
 
       function Navigation() {
         const path = useRouter();
+        const base = window.BASE_URL || "";
 
         return (
           <nav className="flex items-center justify-between w-full">
-            <a href="#/" className="hover:opacity-80 transition-opacity">
+            <a
+              href={`${base}/`}
+              className="hover:opacity-80 transition-opacity"
+            >
               <Logo />
             </a>
             <div className="space-x-4">
               <a
-                href="#/"
+                href={`${base}/`}
                 className={`${
-                  path === "#/"
+                  path === "/" || path === ""
                     ? "text-primary-600 dark:text-primary-400"
                     : "text-neutral-600 dark:text-neutral-400 hover:text-primary-600 dark:hover:text-primary-400"
                 }`}
@@ -440,9 +446,9 @@
                 Home
               </a>
               <a
-                href="#/about"
+                href={`${base}/about`}
                 className={`${
-                  path === "#/about"
+                  path === "/about"
                     ? "text-primary-600 dark:text-primary-400"
                     : "text-neutral-600 dark:text-neutral-400 hover:text-primary-600 dark:hover:text-primary-400"
                 }`}
@@ -450,9 +456,9 @@
                 About
               </a>
               <a
-                href="#/posts"
+                href={`${base}/posts`}
                 className={`${
-                  path === "#/posts"
+                  path === "/posts"
                     ? "text-primary-600 dark:text-primary-400"
                     : "text-neutral-600 dark:text-neutral-400 hover:text-primary-600 dark:hover:text-primary-400"
                 }`}
