@@ -151,17 +151,71 @@ function updateMetaTags(document, { title, path, data }) {
 async function renderTemplate(template, data) {
   // Import your React components here
   const components = {
-    home: () => `<div class="home">...</div>`,
-    posts: () => `<div class="posts">...</div>`,
-    post: (data) => `
-      <article>
-        <h1>${data.metadata.title}</h1>
-        <div class="content">${data.content}</div>
-      </article>
+    home: () => `
+      <div class="container mx-auto px-4 py-8">
+        <h1 class="text-4xl font-bold mb-8">Welcome to MarkVault</h1>
+        <p class="text-lg mb-4">A modern platform for digital preservation</p>
+      </div>
     `,
+    
+    posts: () => `
+      <div class="container mx-auto px-4 py-8">
+        <h1 class="text-3xl font-bold mb-8">All Posts</h1>
+        <div class="grid gap-6">
+          <!-- Posts will be loaded dynamically -->
+        </div>
+      </div>
+    `,
+    
+    about: () => `
+      <div class="container mx-auto px-4 py-8">
+        <h1 class="text-3xl font-bold mb-8">About MarkVault</h1>
+        <p class="text-lg mb-4">
+          MarkVault is a modern platform designed for preserving digital content.
+        </p>
+      </div>
+    `,
+    
+    post: (data) => {
+      if (!data) return '<div>Post not found</div>';
+      return `
+        <article class="container mx-auto px-4 py-8">
+          <h1 class="text-4xl font-bold mb-4">${data.metadata.title || 'Untitled'}</h1>
+          ${data.metadata.date ? `
+            <time class="text-gray-600 mb-8 block">
+              ${new Date(data.metadata.date).toLocaleDateString()}
+            </time>
+          ` : ''}
+          <div class="prose dark:prose-invert max-w-none">
+            ${data.content || ''}
+          </div>
+        </article>
+      `;
+    }
   };
 
-  return components[template](data);
+  // Add error handling
+  if (!components[template]) {
+    console.error(`Template "${template}" not found`);
+    return `
+      <div class="container mx-auto px-4 py-8">
+        <h1 class="text-3xl font-bold text-red-600">Error</h1>
+        <p>Template "${template}" not found</p>
+      </div>
+    `;
+  }
+
+  try {
+    return components[template](data);
+  } catch (error) {
+    console.error(`Error rendering template "${template}":`, error);
+    return `
+      <div class="container mx-auto px-4 py-8">
+        <h1 class="text-3xl font-bold text-red-600">Error</h1>
+        <p>Failed to render template</p>
+      </div>
+    `;
+  }
 }
 
 async function generateSitemap(routes) {
