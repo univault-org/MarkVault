@@ -899,7 +899,6 @@
         const { posts, isLoading } = React.useContext(GlobalContext);
         const [postData, setPostData] = React.useState([]);
         const [error, setError] = React.useState(null);
-        console.log("BASE_URL:>>>>>", window.BASE_URL);
         React.useEffect(() => {
           if (!isLoading) {
             Promise.all(

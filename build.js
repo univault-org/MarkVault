@@ -57,7 +57,7 @@ async function generateHTML(sourceHTML, route) {
     '</head>',
     `
     <script>
-      window.BASE_URL = '/MarkVault';
+      window.BASE_URL = 'https://raw.githubusercontent.com/univault-org/MarkVault/deploy/gh-pages';
       window.initialRoute = '${route}';
     </script>
     </head>
