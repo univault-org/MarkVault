@@ -108,8 +108,16 @@ async function generateHTML({ path, template, title, data }) {
   const content = await renderTemplate(template, data);
   document.getElementById("root").innerHTML = content;
 
-  // Add preload hints
-  addPreloadHints(document);
+  // Add build version
+  const buildVersion = new Date().toISOString();
+  const scriptTag = document.createElement("script");
+  scriptTag.textContent = `
+    window.BUILD_VERSION = "${buildVersion}";
+    window.BASE_URL = window.location.hostname === "localhost" ? "" : "/MarkVault";
+    console.log("🏗️ Build version:", window.BUILD_VERSION);
+    console.log("📍 BASE_URL:", window.BASE_URL);
+  `;
+  document.head.appendChild(scriptTag);
 
   return dom.serialize();
 }
