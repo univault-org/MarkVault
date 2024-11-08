@@ -407,14 +407,14 @@
 
         return (
           <nav className="flex items-center justify-between w-full">
-            <a href="#/" className="hover:opacity-80 transition-opacity">
+            <a href="/" className="hover:opacity-80 transition-opacity">
               <Logo />
             </a>
             <div className="space-x-4">
               <a
-                href="#/"
+                href="/"
                 className={`${
-                  path === "#/"
+                  path === "/"
                     ? "text-primary-600 dark:text-primary-400"
                     : "text-neutral-600 dark:text-neutral-400 hover:text-primary-600 dark:hover:text-primary-400"
                 }`}
@@ -422,9 +422,9 @@
                 Home
               </a>
               <a
-                href="#/about"
+                href="/about"
                 className={`${
-                  path === "#/about"
+                  path === "/about"
                     ? "text-primary-600 dark:text-primary-400"
                     : "text-neutral-600 dark:text-neutral-400 hover:text-primary-600 dark:hover:text-primary-400"
                 }`}
@@ -432,9 +432,9 @@
                 About
               </a>
               <a
-                href="#/posts"
+                href="/posts"
                 className={`${
-                  path === "#/posts"
+                  path === "/posts"
                     ? "text-primary-600 dark:text-primary-400"
                     : "text-neutral-600 dark:text-neutral-400 hover:text-primary-600 dark:hover:text-primary-400"
                 }`}
@@ -524,7 +524,7 @@
             <div className="mb-4">
               <h3>
                 <a
-                  href={`#/posts/${slug}`}
+                  href={`/posts/${slug}`}
                   className="no-underline text-neutral-700 dark:text-neutral-200 hover:text-primary-600 dark:hover:text-primary-400"
                 >
                   {title}
@@ -541,7 +541,7 @@
           <article className="bg-white dark:bg-neutral-800 p-6 rounded-lg shadow-sm animate-fadeIn hover:shadow-md transition-shadow">
             <h2 className="text-2xl font-bold text-neutral-800 dark:text-neutral-100">
               <a
-                href={`#/posts/${slug}`}
+                href={`/posts/${slug}`}
                 className="hover:text-primary-600 dark:hover:text-primary-400"
               >
                 {title}
@@ -635,14 +635,14 @@
                     </p>
                     <div className="flex gap-4 justify-center pt-4">
                       <a
-                        href="#/posts"
+                        href="/posts"
                         className="inline-flex items-center px-6 py-3 rounded-lg bg-primary-500 hover:bg-primary-600 text-white font-medium transition-colors"
                       >
                         Explore Posts
                         <i className="bi bi-arrow-right ml-2"></i>
                       </a>
                       <a
-                        href="#/about"
+                        href="/about"
                         className="inline-flex items-center px-6 py-3 rounded-lg bg-neutral-100 hover:bg-neutral-200 dark:bg-neutral-700 dark:hover:bg-neutral-600 text-neutral-700 dark:text-neutral-100 font-medium transition-colors"
                       >
                         Learn More
@@ -880,7 +880,7 @@
                 Join us in building a more durable web.
               </p>
               <a
-                href="#/posts"
+                href="/posts"
                 className="inline-flex items-center px-6 py-3 rounded-lg bg-primary-500 hover:bg-primary-600 text-white font-medium transition-colors"
               >
                 Explore Posts
@@ -981,7 +981,7 @@
                         </time>
                         <h2 className="text-2xl font-bold text-neutral-800 dark:text-neutral-100 mt-2 mb-4">
                           <a
-                            href={`#/posts/${postData[0].slug}`}
+                            href={`/posts/${postData[0].slug}`}
                             className="hover:text-primary-600 dark:hover:text-primary-400"
                           >
                             {postData[0].title}
@@ -993,7 +993,7 @@
                           </p>
                         )}
                         <a
-                          href={`#/posts/${postData[0].slug}`}
+                          href={`/posts/${postData[0].slug}`}
                           className="inline-flex items-center text-primary-600 dark:text-primary-400 hover:underline"
                         >
                           Read More
@@ -1016,7 +1016,7 @@
                       </time>
                       <h2 className="text-xl font-bold text-neutral-800 dark:text-neutral-100 mt-2 mb-4">
                         <a
-                          href={`#/posts/${post.slug}`}
+                          href={`/posts/${post.slug}`}
                           className="hover:text-primary-600 dark:hover:text-primary-400"
                         >
                           {post.title}
@@ -1028,7 +1028,7 @@
                         </p>
                       )}
                       <a
-                        href={`#/posts/${post.slug}`}
+                        href={`/posts/${post.slug}`}
                         className="inline-flex items-center text-primary-600 dark:text-primary-400 hover:underline"
                       >
                         Read More
@@ -1267,7 +1267,7 @@
                 {/* Article Footer with enhanced navigation */}
                 <footer className="mt-12 mb-16 flex flex-col sm:flex-row justify-between items-center gap-4 text-neutral-500 dark:text-neutral-400">
                   <a
-                    href="#/posts"
+                    href="/posts"
                     className="inline-flex items-center px-4 py-2 rounded-lg bg-neutral-100 dark:bg-neutral-800 hover:bg-neutral-200 dark:hover:bg-neutral-700 transition-colors"
                   >
                     <i className="bi bi-arrow-left mr-2"></i>
@@ -1310,10 +1310,10 @@
         return (
           <GlobalProvider>
             <Layout>
-              {path === "#/" && <Home />}
-              {path === "#/about" && <About />}
-              {path === "#/posts" && <PostList />}
-              {path.startsWith("#/posts/") && (
+              {path === "/" && <Home />}
+              {path === "/about" && <About />}
+              {path === "/posts" && <PostList />}
+              {path.startsWith("/posts/") && (
                 <Post slug={path.split("/")[2]} />
               )}
             </Layout>
