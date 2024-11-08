@@ -165,35 +165,40 @@
        */
       async function fetchMarkdown(type, fileName) {
         try {
-          const cleanFileName = fileName.replace(/^\/+/, "");
-          const response = await fetch(`./content/${type}/${cleanFileName}`);
+          const cleanFileName = fileName.replace(/^\/+|\/+$/g, "");
+          const base = window.BASE_URL || "";
+
+          // Update the fetch path to include BASE_URL
+          const response = await fetch(
+            `${base}/content/${type}/${cleanFileName}`
+          );
+
+          console.group("📚 Fetching Markdown");
+          console.log("Type:", type);
+          console.log("File:", cleanFileName);
+          console.log("URL:", `${base}/content/${type}/${cleanFileName}`);
+          console.groupEnd();
 
           if (!response.ok) {
-            console.error(`HTTP error! status: ${response.status}`);
-            throw new Error(`Failed to fetch ${fileName} (${response.status})`);
+            throw new Error(`Failed to fetch ${fileName}: ${response.status}`);
           }
 
           const text = await response.text();
-          console.log("Fetched content:", text.substring(0, 100)); // Debug log
-
-          // Parse frontmatter and content
           const parts = text.split("---\n");
+
           if (parts.length < 3) {
             return {
-              content: text, // Raw markdown text instead of marked.parse
               metadata: {},
+              content: text,
             };
           }
 
-          const [, frontmatter, ...contentParts] = parts;
-          const metadata = parseFrontmatter(frontmatter);
-
           return {
-            content: contentParts.join("---\n"), // Raw markdown text
-            metadata,
+            metadata: yaml.load(parts[1]) || {},
+            content: parts.slice(2).join("---\n"),
           };
         } catch (error) {
-          console.error(`Error fetching markdown:`, error);
+          console.error("Error fetching markdown:", error);
           throw error;
         }
       }
@@ -251,18 +256,18 @@
         try {
           // For development, return hardcoded list
           console.log("Fetching content list for:", type); // Debug log
-          return type === "posts" ? ["WHY.md"] : [];
+          const base = window.BASE_URL || "";
+          const response = await fetch(`${base}/content/${type}`);
 
-          // The following code will be used when we have proper server setup
-          /*
-          const response = await fetch(`./content/${type}/`);
+          console.log(`Fetching content list for: ${type}`);
+          console.log("URL:", `${base}/content/${type}`);
+
           if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
+            throw new Error(`Failed to fetch content list: ${response.status}`);
           }
-          const text = await response.text();
-          const files = text.match(/href="([^"]+\.md)"/g) || [];
-          return files.map(file => file.replace('href="', '').replace('"', ''));
-          */
+
+          const data = await response.json();
+          return data.files || [];
         } catch (error) {
           console.error(`Error fetching ${type} list:`, error);
           // For development, return hardcoded list even if fetch fails
@@ -1311,9 +1316,7 @@
               {path === "/" && <Home />}
               {path === "/about" && <About />}
               {path === "/posts" && <PostList />}
-              {path.startsWith("/posts/") && (
-                <Post slug={path.split("/")[2]} />
-              )}
+              {path.startsWith("/posts/") && <Post slug={path.split("/")[2]} />}
             </Layout>
           </GlobalProvider>
         );
