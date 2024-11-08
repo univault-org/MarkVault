@@ -3,7 +3,7 @@ const path = require("path");
 const { JSDOM } = require("jsdom");
 const React = require("react");
 const ReactDOMServer = require("react-dom/server");
-const marked = require("marked");
+const { marked } = require("marked");
 const yaml = require("js-yaml");
 
 async function build() {
