@@ -152,12 +152,24 @@ async function renderTemplate(template, data) {
   // Import your React components here
   const components = {
     home: () => `
-      <div class="container mx-auto px-4 py-8">
-        <h1 class="text-4xl font-bold mb-8">Welcome to MarkVault</h1>
-        <p class="text-lg mb-4">A modern platform for digital preservation</p>
-      </div>
-    `,
-    
+    <div class="space-y-16 animate-fadeIn">
+      <!-- Hero Section -->
+      <section class="relative bg-gradient-to-br from-neutral-50 to-neutral-100 dark:from-neutral-800 dark:to-neutral-900 py-16 -mt-8">
+        <div class="absolute inset-0 overflow-hidden">
+          <div class="absolute inset-0 bg-[linear-gradient(to_right,#8882_1px,transparent_1px),linear-gradient(to_bottom,#8882_1px,transparent_1px)] bg-[size:14px_24px] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_110%)]"></div>
+        </div>
+        <div class="relative max-w-4xl mx-auto px-4 text-center">
+          <h1 class="text-4xl md:text-5xl font-bold text-neutral-800 dark:text-neutral-100 mb-4">
+            Welcome to MarkVault
+          </h1>
+          <p class="text-lg text-neutral-600 dark:text-neutral-300 max-w-2xl mx-auto">
+            A modern platform for digital preservation
+          </p>
+        </div>
+      </section>
+    </div>
+  `,
+
     posts: () => `
       <div class="container mx-auto px-4 py-8">
         <h1 class="text-3xl font-bold mb-8">All Posts</h1>
@@ -166,32 +178,86 @@ async function renderTemplate(template, data) {
         </div>
       </div>
     `,
-    
-    about: () => `
-      <div class="container mx-auto px-4 py-8">
-        <h1 class="text-3xl font-bold mb-8">About MarkVault</h1>
-        <p class="text-lg mb-4">
-          MarkVault is a modern platform designed for preserving digital content.
-        </p>
-      </div>
-    `,
-    
+
+    about: async () => {
+      try {
+        // Read about.md content
+        const aboutContent = await readContent("site/content/pages");
+        const aboutPage = aboutContent.find((page) => page.slug === "about");
+
+        if (!aboutPage) {
+          console.error("About page content not found");
+          return "<div>About page not found</div>";
+        }
+
+        return `
+            <div class="space-y-16 animate-fadeIn">
+              <!-- Header Section -->
+              <section class="relative bg-gradient-to-br from-neutral-50 to-neutral-100 dark:from-neutral-800 dark:to-neutral-900 py-16 -mt-8">
+                <div class="absolute inset-0 overflow-hidden">
+                  <div class="absolute inset-0 bg-[linear-gradient(to_right,#8882_1px,transparent_1px),linear-gradient(to_bottom,#8882_1px,transparent_1px)] bg-[size:14px_24px] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_110%)]"></div>
+                </div>
+                <div class="relative max-w-4xl mx-auto px-4 text-center">
+                  <h1 class="text-4xl md:text-5xl font-bold text-neutral-800 dark:text-neutral-100 mb-4">
+                    ${aboutPage.metadata.title || "About"}
+                  </h1>
+                  ${
+                    aboutPage.metadata.subtitle
+                      ? `
+                    <p class="text-lg text-neutral-600 dark:text-neutral-300 max-w-2xl mx-auto">
+                      ${aboutPage.metadata.subtitle}
+                    </p>
+                  `
+                      : ""
+                  }
+                </div>
+              </section>
+  
+              <!-- Content Section -->
+              <section class="max-w-4xl mx-auto px-4">
+                <div class="prose dark:prose-invert mx-auto">
+                  ${aboutPage.content}
+                </div>
+              </section>
+            </div>
+          `;
+      } catch (error) {
+        console.error("Error rendering about page:", error);
+        return "<div>Error loading about page</div>";
+      }
+    },
+
     post: (data) => {
-      if (!data) return '<div>Post not found</div>';
+      if (!data) {
+        console.error("No data provided for post template");
+        return "<div>Post not found</div>";
+      }
+
+      console.log("Rendering post:", {
+        title: data.metadata.title,
+        content: data.content.substring(0, 100) + "...", // Debug preview
+      });
+
       return `
-        <article class="container mx-auto px-4 py-8">
-          <h1 class="text-4xl font-bold mb-4">${data.metadata.title || 'Untitled'}</h1>
-          ${data.metadata.date ? `
-            <time class="text-gray-600 mb-8 block">
-              ${new Date(data.metadata.date).toLocaleDateString()}
-            </time>
-          ` : ''}
-          <div class="prose dark:prose-invert max-w-none">
-            ${data.content || ''}
-          </div>
-        </article>
-      `;
-    }
+          <article class="prose dark:prose-invert mx-auto px-4 py-8 max-w-4xl">
+            <h1 class="text-4xl font-bold mb-4">${
+              data.metadata.title || "Untitled"
+            }</h1>
+            ${
+              data.metadata.date
+                ? `
+              <time class="text-gray-600 mb-8 block">
+                ${new Date(data.metadata.date).toLocaleDateString()}
+              </time>
+            `
+                : ""
+            }
+            <div class="markdown-content">
+              ${data.content || ""}
+            </div>
+          </article>
+        `;
+    },
   };
 
   // Add error handling
