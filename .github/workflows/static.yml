@@ -41,6 +41,18 @@ jobs:
       - name: Build site
         run: pnpm build
 
+      - name: Add cache headers
+        run: |
+          echo "Cache-Control: no-cache, no-store, must-revalidate" > docs/.nojekyll
+          echo "Pragma: no-cache" >> docs/.nojekyll
+          echo "Expires: 0" >> docs/.nojekyll
+          
+      - name: Add build timestamp
+        run: |
+          TIMESTAMP=$(date +%Y%m%d%H%M%S)
+          echo "window.BUILD_TIME = '$TIMESTAMP';" >> docs/build-info.js
+          echo "<script src='build-info.js?v=$TIMESTAMP'></script>" >> docs/index.html
+
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
