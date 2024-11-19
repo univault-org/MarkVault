@@ -1,9 +1,9 @@
-# Simple workflow for deploying static content to GitHub Pages
-name: Deploy static content to Pages
+# Workflow for deploying Next.js static content to GitHub Pages
+name: Deploy Next.js site to Pages
 
 on:
   push:
-    branches: ["deploy/gh-pages"]
+    branches: ["main"]
   workflow_dispatch:
 
 permissions:
@@ -35,16 +35,24 @@ jobs:
         with:
           version: 8
 
+      # Copy content directory into site directory for build
+      - name: Copy content directory
+        run: |
+          mkdir -p site/content
+          cp -r content/* site/content/
+
       - name: Install dependencies
+        working-directory: ./site
         run: pnpm install
 
       - name: Build site
+        working-directory: ./site
         run: pnpm build
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: './docs'
+          path: './site/out'
 
       - name: Deploy to GitHub Pages
         id: deployment

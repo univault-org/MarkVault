@@ -27,7 +27,9 @@ function verifyPaths() {
 verifyPaths();
 
 // Update the content directory path
-const contentDirectory = path.join(process.cwd(), "..", "content");
+const contentDirectory = path.join(process.cwd(), 
+  process.env.NODE_ENV === 'production' ? 'content' : '../content'
+);
 
 async function markdownToHtml(markdown) {
   const result = await remark()
