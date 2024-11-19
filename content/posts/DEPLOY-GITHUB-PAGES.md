@@ -1,9 +1,13 @@
 ---
-title: "Deploying Your MarkVault Site to GitHub Pages: A Step-by-Step Guide"
+# Frontmatter Guide:
+# - Use quotes for titles containing special characters like : { } [ ] ,
+# - Example with special chars: title: "My Title: A Subtitle"
+# - Example without special chars: title: My Simple Title
+title: "Deploying Your MarkVault Site to GitHub Pages: A Step-by-Step Guide" 
 date: 2024-11-19
 author: Phil T
 excerpt: "Learn how to deploy your MarkVault site to GitHub Pages using GitHub Actions. This guide covers the complete setup process, from configuring Next.js for static export to automating deployments."
-image: "https://images.unsplash.com/photo-1618401471353-b98afee0b2eb?q=80&w=1920&auto=format&fit=crop"
+image: https://images.unsplash.com/photo-1618401471353-b98afee0b2eb?q=80&w=1920&auto=format&fit=crop
 tags: [deployment, github-pages, nextjs, automation]
 ---
 

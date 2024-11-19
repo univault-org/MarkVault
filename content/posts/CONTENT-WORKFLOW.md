@@ -1,4 +1,8 @@
 ---
+# Frontmatter Guide:
+# - Use quotes for titles containing special characters like : { } [ ] ,
+# - Example with special chars: title: "My Title: A Subtitle"
+# - Example without special chars: title: My Simple Title
 title: The Ideal Content Workflow with MarkVault
 date: 2024-11-18
 author: Univault Technologies

@@ -23,6 +23,20 @@ function verifyPaths() {
   });
 }
 
+function sanitizeTitle(title) {
+    if (!title) return '';
+    
+    // If title contains special characters but isn't quoted, quote it
+    if (
+      (title.includes(':') || title.includes('"') || title.includes("'")) && 
+      !title.startsWith('"') && 
+      !title.startsWith("'")
+    ) {
+      return `"${title.replace(/"/g, '\\"')}"`;
+    }
+    return title;
+  }
+
 // Call verification on module load
 verifyPaths();
 

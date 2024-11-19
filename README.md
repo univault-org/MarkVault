@@ -4,8 +4,8 @@ A lightweight starter template for building knowledge bases, websites, and blogs
 
 ## Why MarkVault?
 
-- 🎯 **Purpose-Built**: Designed specifically for knowledge bases and technical blogs
-- 🛠 **Developer-Friendly**: Uses familiar tools - React, Markdown, and simple HTML/JS
+- 🎯 **Purpose-Built**: Designed specifically for modern SEO optimized websites, knowledge bases and technical blogs
+- 🛠 **Developer-Friendly**: Uses familiar tools - React, Next.js, Markdown, and simple HTML/JS
 - 🔒 **Future-Proof**: Simple tech stack ensures long-term maintainability
 
 ## Key Features
@@ -16,11 +16,54 @@ A lightweight starter template for building knowledge bases, websites, and blogs
 - Site content survives even if the main site goes down
 - True to the original vision of distributed web
 
-### 🤝 Community-Driven Content
-- Contributors write content locally
-- Submit via Pull Requests
-- Site owners review and approve
-- Content is preserved across multiple locations
+### 🤝 Content Contribution Made Simple
+1. Clone the repository:
+```bash
+git clone https://github.com/univault-org/MarkVault.git
+```
+
+2. Add or edit markdown files in the `content` folder:
+```
+content/
+├── posts/          # Blog posts go here
+│   └── WHY.md
+├── pages/          # Static pages
+│   └── about.md
+└── images/         # Images for your content
+    └── banner.jpg
+```
+
+3. Preview your content instantly using any of these methods:
+```bash
+# Using Python (Python 3 required)
+python -m http.server
+
+# OR using Node.js
+npx http-server
+
+# OR using PHP
+php -S localhost:8000
+
+# Then open http://localhost:8000 in your browser
+```
+
+4. Or simply use VS Code:
+- Install "Live Server" extension
+- Right-click `index.html`
+- Select "Open with Live Server"
+
+No need to:
+- Set up Node.js or Next.js
+- Install dependencies
+- Run complex build commands
+- Configure development environment
+
+Just write markdown, preview instantly, and submit your changes!
+
+### 🌐 Dual Development Paths
+- **Content Contributors**: Use simple HTML preview
+- **Site Developers**: Full Next.js development environment
+- **Best of Both**: Choose the workflow that suits you
 
 ## Quick Start
 
