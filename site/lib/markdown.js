@@ -40,10 +40,30 @@ function sanitizeTitle(title) {
 // Call verification on module load
 verifyPaths();
 
-// Update the content directory path
-const contentDirectory = path.join(process.cwd(), 
-  process.env.NODE_ENV === 'production' ? 'content' : '../content'
-);
+// Update the content directory path handling
+function getContentDirectory() {
+  const cwd = process.cwd();
+  
+  // Try different possible content locations
+  const possiblePaths = [
+    path.join(cwd, 'content'),
+    path.join(cwd, '..', 'content'),
+    path.join(cwd, 'site', 'content')
+  ];
+
+  for (const dir of possiblePaths) {
+    if (fs.existsSync(dir)) {
+      console.log('Found content directory at:', dir);
+      return dir;
+    }
+  }
+
+  console.error('Content directory not found in any of:', possiblePaths);
+  throw new Error('Content directory not found');
+}
+
+// Initialize content directory
+const contentDirectory = getContentDirectory();
 
 async function markdownToHtml(markdown) {
   const result = await remark()
@@ -62,35 +82,47 @@ export async function getAllPosts() {
 
     if (!fs.existsSync(postsDirectory)) {
       console.warn("Posts directory not found:", postsDirectory);
-      console.log("Available directories:", fs.readdirSync(path.dirname(postsDirectory)));
+      console.log("Content directory structure:", {
+        contentDir: fs.readdirSync(contentDirectory),
+        cwd: process.cwd(),
+      });
       return [];
     }
 
     const filenames = fs.readdirSync(postsDirectory);
     console.log('Found post files:', filenames);
 
+    if (!filenames.length) {
+      console.warn('No markdown files found in posts directory');
+      return [];
+    }
+
     const posts = filenames
       .filter((filename) => filename.endsWith(".md"))
       .map((filename) => {
-        const filePath = path.join(postsDirectory, filename);
-        const fileContents = fs.readFileSync(filePath, "utf8");
-        const { data, content } = matter(fileContents);
+        try {
+          const filePath = path.join(postsDirectory, filename);
+          const fileContents = fs.readFileSync(filePath, "utf8");
+          const { data, content } = matter(fileContents);
 
-        const date = data.date
-          ? format(new Date(data.date), "MMMM d, yyyy")
-          : "Unknown date";
+          const date = data.date
+            ? format(new Date(data.date), "MMMM d, yyyy")
+            : "Unknown date";
 
-        return {
-          slug: filename.replace(/\.md$/, ""),
-          title: data.title || filename.replace(/\.md$/, ""),
-          date: date,
-          excerpt: data.excerpt || "",
-          image:
-            data.image ||
-            "https://images.unsplash.com/photo-1524995997946-a1c2e315a42f?q=80&w=1920&auto=format&fit=crop",
-          content,
-        };
-      });
+          return {
+            slug: filename.replace(/\.md$/, ""),
+            title: data.title || filename.replace(/\.md$/, ""),
+            date: date,
+            excerpt: data.excerpt || "",
+            image: data.image ||
+              "https://images.unsplash.com/photo-1524995997946-a1c2e315a42f?q=80&w=1920&auto=format&fit=crop",
+          };
+        } catch (error) {
+          console.error(`Error processing post ${filename}:`, error);
+          return null;
+        }
+      })
+      .filter(Boolean); // Remove any null entries from errors
 
     return posts.sort((a, b) => {
       if (!a.date || a.date === "Unknown date") return 1;
