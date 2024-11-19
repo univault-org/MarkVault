@@ -95,33 +95,6 @@ git push -u origin deploy/gh-pages
 
 Your site will be available at: `https://YOUR_USERNAME.github.io/YOUR_REPO/`
 
-## Local Development
-
-1. Install dependencies (optional, for development):
-```bash
-pnpm install
-```
-
-2. Start development server:
-```bash
-pnpm dev
-# or use any static server:
-npx serve site
-```
-
-3. Open `http://localhost:3000` in your browser
-
-## Project Structure
-
-```
-markvault/
-├── site/             # Main site files
-│   ├── index.html    # Main application file
-│   └── content/      # Markdown content
-│       ├── posts/    # Blog posts
-│       └── pages/    # Static pages
-└── README.md         # This file
-```
 
 ## Content Management
 
@@ -190,10 +163,22 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## Acknowledgments
 
-- Built with [React](https://reactjs.org/)
+### Core Technologies
+- Built with [Next.js](https://nextjs.org/) and [React](https://reactjs.org/)
+- Alternative setup available with pure [React](https://reactjs.org/)
+
+### Styling & UI
 - Styled with [Tailwind CSS](https://tailwindcss.com/)
 - Icons from [Bootstrap Icons](https://icons.getbootstrap.com/)
-- Markdown parsing by [React Markdown](https://github.com/remarkjs/react-markdown)
+
+### Content Processing
+- Markdown parsing by [Remark](https://github.com/remarkjs/remark)
+- GFM support via [remark-gfm](https://github.com/remarkjs/remark-gfm)
+- Frontmatter parsing with [gray-matter](https://github.com/jonschlinkert/gray-matter)
+
+### Development Tools
+- Package management with [pnpm](https://pnpm.io/)
+- Date formatting with [date-fns](https://date-fns.org/)
 
 ---
 
