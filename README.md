@@ -26,14 +26,36 @@ A lightweight starter template for building knowledge bases, websites, and blogs
 
 1. Use this template:
 ```bash
+# Clone the repository
 git clone https://github.com/univault-org/MarkVault.git my-site
+
+# Navigate to my-site
 cd my-site
+
+# Navigate to the Next.js app directory
+cd site
+
 # Install dependencies
 pnpm install
 
-# Start development
+# Start development server
 pnpm dev
 ```
+
+The project structure will look like this:
+```
+my-site/              # Root directory
+├── content/          # Your content lives here
+│   ├── posts/        # Blog posts in markdown
+│   └── pages/        # Static pages in markdown
+│
+└── site/            # Next.js application
+    ├── app/         # Next.js app directory
+    ├── components/  # React components
+    └── package.json # Dependencies and scripts
+```
+
+Note: All development commands (pnpm install, pnpm dev) must be run from the `site` directory, while content is managed in the `content` directory at the root level.
 
 ### React Setup (Simple Development)
 
