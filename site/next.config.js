@@ -4,6 +4,8 @@ const nextConfig = {
     
     // Configure base path for GitHub Pages
     basePath: process.env.NODE_ENV === 'production' ? '/MarkVault' : '',
+    //IMPORTANT: for custom domains:
+    //basePath: process.env.NODE_ENV === 'production' ? '' : '',
     
     // Required for static export
     images: {
